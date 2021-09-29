@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module": "CommonJS",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "outDir": "out"
+  },
+  "include": ["src/**/*", "index.ts"],
+  "exclude": ["node_modules"]
+}

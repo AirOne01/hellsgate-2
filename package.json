@@ -1,0 +1,25 @@
+{
+  "name": "hellsgate-2",
+  "version": "2.0.0",
+  "description": "Hell's gate",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "run": "tsc && node ./build/index.js",
+    "dev": "nodemon ./src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "commander": "^8.2.0",
+    "is-valid-path": "^0.1.1",
+    "prompts": "^2.4.1"
+  },
+  "devDependencies": {
+    "@types/commander": "^2.12.2",
+    "@types/is-valid-path": "^0.1.0",
+    "@types/node": "^16.10.2",
+    "@types/prompts": "^2.0.14"
+  }
+}
