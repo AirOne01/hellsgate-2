@@ -5,12 +5,12 @@ import { Proxy } from '../Interfaces/Proxy';
  */
 class Config {
   proxies?: Proxy[];
-  usePublicProxiesLists: boolean;
-  proxyAPI: boolean;
-  blacklistedSources?: string[];
-  whitelistedSources?: string[];
-  blacklistedProxies?: Proxy[];
-  whitelistedProxies?: Proxy[];
+  private usePublicProxiesLists: boolean;
+  private proxyAPI: boolean;
+  private blacklistedSources?: string[];
+  private whitelistedSources?: string[];
+  private blacklistedProxies?: Proxy[];
+  private whitelistedProxies?: Proxy[];
 
   constructor(usePublicProxiesLists?: boolean, proxyAPI?: boolean) {
     this.usePublicProxiesLists = usePublicProxiesLists;

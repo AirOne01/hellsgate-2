@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
+    "target": "ESNext",
     "module": "CommonJS",
+    "declaration": true,
     "noImplicitAny": true,
     "removeComments": true,
     "sourceMap": true,
     "outDir": "out"
   },
-  "include": ["src/**/*", "index.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [],
+  "include": [
+    "src", "index.ts"
+  ]
 }

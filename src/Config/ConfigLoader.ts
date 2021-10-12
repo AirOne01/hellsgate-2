@@ -6,7 +6,7 @@ import { Config } from './Config';
  * Reprents the config loader.
  */
 class ConfigLoader {
-  path: string;
+  private path: string;
 
   constructor(path?: string) {
     if (!path) {
@@ -46,6 +46,15 @@ class ConfigLoader {
    */
   public load(): Config {
     return require(this.path);
+  }
+
+  /**
+   * Gets the path to the config file
+   * 
+   * @returns {string} the path to the config file
+   */
+  public getPath(): string {
+    return this.path;
   }
 }
 

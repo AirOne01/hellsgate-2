@@ -3,10 +3,12 @@ import isValid from "is-valid-path";
 import prompts from "prompts";
 import { join, isAbsolute } from "path";
 import { program } from "commander";
+import { writeFileSync } from "fs";
 
 import { ConfigLoader } from "./src/Config/ConfigLoader";
-import { writeFileSync } from "fs";
 import { Config } from "./src/Config/Config";
+import { Proxy } from "./src/Interfaces/Proxy";
+import { HGWindow } from "./src/HGWindow"
 
 program
   .version("2.0.0")
@@ -18,7 +20,7 @@ program
   )
   .option("-h, --headless", "run headless")
   .option("--nopublic", "don't use public proxy lists")
-  .option("--nodiscovery", "don't discover or test proxies");
+  .option("--nodiscovery", "don't test proxies speeed and reaction");
 
 program.parse(process.argv);
 const opts: any = program.opts();
@@ -75,7 +77,18 @@ if (opts['config']) {
     // pass the arguments inside the function
     config = new Config(usePublicProxiesLists, proxyAPI);
 
-    writeFileSync(loader.path, JSON.stringify(config, null, 2));
+    writeFileSync(loader.getPath(), JSON.stringify(config, null, 2));
     console.log("✔️ Wrote config");
+
+    let proxies: Proxy[];
+    for (let i = 0; i<50; i++) proxies.push({host: '127.0.0.1'});
+    config.proxies = proxies;
+    
+    const window = new HGWindow(config)
+    console.log(window.render(proxies));
   } else config = loader.load(); // if the file exists load the config
 })();
+
+while(true) {
+
+}
