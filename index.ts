@@ -1,6 +1,7 @@
 import axios from "axios";
+import blessed from "blessed";
+import chalk from "chalk";
 import isValid from "is-valid-path";
-import prompts from "prompts";
 import { join, isAbsolute } from "path";
 import { program } from "commander";
 import { writeFileSync } from "fs";
@@ -8,16 +9,13 @@ import { writeFileSync } from "fs";
 import { ConfigLoader } from "./src/Config/ConfigLoader";
 import { Config } from "./src/Config/Config";
 import { Proxy } from "./src/Interfaces/Proxy";
-import { HGWindow } from "./src/HGWindow"
+import { HGWindow } from "./src/HGWindow";
 
 program
   .version("2.0.0")
   .usage("[config]")
   .option("--api", "launch the proxy api")
-  .option(
-    "-c, --config filename",
-    "load a specific config file"
-  )
+  .option("-c, --config filename", "load a specific config file")
   .option("-h, --headless", "run headless")
   .option("--nopublic", "don't use public proxy lists")
   .option("--nodiscovery", "don't test proxies speeed and reaction");
@@ -45,8 +43,8 @@ let config: Config = new Config(true, false);
 let loader: ConfigLoader;
 let path: string;
 
-if (opts['config']) {
-  loader = new ConfigLoader(parsePath(opts['config']));
+if (opts["config"]) {
+  loader = new ConfigLoader(parsePath(opts["config"]));
 } else if (program.args) {
   loader = new ConfigLoader(parsePath(program.args[0]));
 } else {
@@ -54,50 +52,130 @@ if (opts['config']) {
   loader.cancelCheck();
 }
 
-(async () => {
-  if (!loader.check()) {
-    console.log(1);
+if (loader.check()) {
+  // if the file doesn't exists create one
+  console.log("⚠️ Config file doesn't exist or is invalid. Writing new file.");
 
-    // if the file doesn't exists create one
-    console.log(
-      "⚠️ Config file doesn't exist or is invalid. Writing new file."
-    );
+  // new screen object
+  const screen: blessed.Widgets.Screen = blessed.screen();
+  screen.title = "Hell's Gate v2";
 
-    const usePublicProxiesLists: boolean = opts['nopublic'] || await prompts({
-      type: 'confirm',
-      name: 'value',
-      message: 'Use public proxy scrape sites?',
-      initial: true
+  let infoBox: blessed.Widgets.BoxElement = blessed.box({
+    parent: screen,
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    height: 5,
+    border: "line",
+    fg: "red",
+    value: ""
+  })
+  screen.append(infoBox);
+
+  let proxyBox: blessed.Widgets.BoxElement = blessed.box({
+    parent: screen,
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: (screen.height as number) - 5,
+    border: "line",
+    fg: "red",
+    value: ""
+  })
+  screen.append(proxyBox);
+
+  let usePublicProxiesLists: boolean;
+  let undefinedUsePublicProxiesLists: boolean = false;
+  let proxyAPI: boolean;
+  let undefinedProxyAPI: boolean = false;
+
+  if (opts.hasOwnProperty("api")) {
+    proxyAPI = opts["api"];
+  } else {
+    proxyAPI = false;
+    undefinedProxyAPI = true;
+  }
+  if (opts.hasOwnProperty("nopublic")) {
+    usePublicProxiesLists = opts["nopublic"];
+  } else {
+    usePublicProxiesLists = false;
+    undefinedUsePublicProxiesLists = true;
+  }
+
+  // this whole part is for replacing prompts.js with native prompts
+  if (undefinedUsePublicProxiesLists || undefinedProxyAPI) {
+    const prompt: blessed.Widgets.PromptElement = blessed.prompt({
+      parent: screen,
+      left: "center",
+      top: "center",
+      border: "line"
     })
 
-    const proxyAPI: boolean = opts['api'] || await prompts({
-      type: 'confirm',
-      name: 'value',
-      message: 'Start the proxy API with the app?',
-      initial: false
-    })
+    if (undefinedProxyAPI && undefinedUsePublicProxiesLists) {
+      prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Use the proxy API ? (true/False): ", "false", (err, value) => {
+        if (err) {
+          infoBox.content = err;
+        } else if (value) {
+          proxyAPI = (value === "true");
+          infoBox.content = chalk.greenBright("✔️ Edited 'proxyAPI' ") + chalk.magenta(proxyAPI);
+        }
+        screen.render();
+        prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Fetch public proxies list ? (True/false): ", "true", (err, value) => {
+          if (err) {
+            infoBox.content = err;
+          } else if (value) {
+            usePublicProxiesLists = (value === "true");
+            infoBox.content = chalk.greenBright("✔️ Edited 'usePublicProxiesLists' ") + chalk.magenta(usePublicProxiesLists);
+          }
+          screen.render();
+        });
+      })
+    } else if (undefinedProxyAPI) {
+      prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Use the proxy API ? (true/False): ", "false", (err, value) => {
+        if (err) {
+          infoBox.content = err;
+        } else if (value) {
+          proxyAPI = (value === "true");
+          infoBox.content = chalk.greenBright("✔️ Edited 'proxyAPI' ") + chalk.magenta(proxyAPI);
+        }
+        screen.render();
+      })
+    } else if (undefinedUsePublicProxiesLists) prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Fetch public proxies list ? (True/false): ", "true", (err, value) => {
+      if (err) {
+        infoBox.content = err;
+      } else if (value) {
+        usePublicProxiesLists = (value === "true");
+        infoBox.content = chalk.greenBright("✔️ Edited 'usePublicProxiesLists' ") + chalk.magenta(usePublicProxiesLists);
+      }
+      screen.render();
+    });
 
-    console.log(2);
+    screen.key(["enter"], function () {
+    });
 
-    // pass the arguments inside the function
-    config = new Config(usePublicProxiesLists, proxyAPI);
-    
-    console.log(3);
+    screen.key(["escape", "C-c"], function () {
+      process.exit(0);
+    });
 
-    writeFileSync(loader.getPath(), JSON.stringify(config, null, 2));
-    console.log("✔️ Wrote config");
+    screen.append(prompt);
+    screen.render();
+  }
 
-    console.log(4);
+  // show result
+  screen.render();
 
-    // debug thing
-    let proxies: Proxy[] = [];
-    for (let i = 0; i<50; i++) proxies.push({host: '127.0.0.1'});
-    config.proxies = proxies;
-    
-    console.log(5);
+  // pass the arguments inside the function
+  config = new Config(usePublicProxiesLists, proxyAPI);
 
-    // renders the window
-    const window = new HGWindow(config)
-    window.render(proxies);
-  } else config = loader.load(); // if the file exists load the config
-})();
+  writeFileSync(loader.getPath(), JSON.stringify(config, null, 2));
+  console.log("✔️ Wrote config");
+
+  // debug thing
+  let proxies: Proxy[] = [];
+  for (let i = 0; i < 50; i++) proxies.push({ host: "127.0.0.1" });
+  config.proxies = proxies;
+
+  // renders the window
+  const window = new HGWindow(config);
+  window.render(proxies);
+} else config = loader.load(); // if the file exists load the config

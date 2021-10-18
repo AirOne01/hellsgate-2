@@ -50,24 +50,5 @@ export class HGWindow {
 
     // proxy list to string
     const table: string = asTable([list]);
-    // new screen object
-    const screen: blessed.Widgets.Screen = blessed.screen();
-    screen.title = "Hell's Gate v2";
-
-    const box: blessed.Widgets.BoxElement = blessed.box({
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      content: table,
-      border: {
-        type: "line"
-      }
-    });
-
-    // show result
-    screen.append(box);
-    box.focus();
-    screen.render();
   }
 }

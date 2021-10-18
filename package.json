@@ -11,17 +11,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/blessed": "^0.1.19",
-    "@types/boxen": "^3.0.1",
-    "@types/chalk": "^2.2.0",
     "as-table": "^1.0.55",
     "axios": "^0.21.4",
     "blessed": "^0.1.81",
+    "chalk": "^4.1.2",
     "commander": "^8.2.0",
-    "is-valid-path": "^0.1.1",
-    "prompts": "^2.4.1"
+    "is-valid-path": "^0.1.1"
   },
   "devDependencies": {
+    "@types/blessed": "^0.1.19",
+    "@types/boxen": "^3.0.1",
+    "@types/chalk": "^2.2.0",
     "@types/commander": "^2.12.2",
     "@types/is-valid-path": "^0.1.0",
     "@types/node": "^16.10.2",
