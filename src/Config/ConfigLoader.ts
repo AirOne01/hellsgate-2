@@ -7,11 +7,19 @@ import { Config } from './Config';
  */
 class ConfigLoader {
   private path: string;
+  private noCheck: boolean = false;
 
   constructor(path?: string) {
     if (!path) {
       this.path = join(__dirname, './hgconfig.json')
     } else this.path = isAbsolute(path) ? path : join(__dirname, path);
+  }
+
+  /**
+   * Abort checking for local file, if not needed.
+   */
+  public cancelCheck(): void {
+    this.noCheck = true;
   }
 
   /**
@@ -29,6 +37,7 @@ class ConfigLoader {
    * @returns {boolean} of whether the config file is valid.
    */
   public check(): boolean {
+    if (this.noCheck) return true;
     if (!this.checkPath()) return false;
     try {
       // may cause errors, so we catch it after

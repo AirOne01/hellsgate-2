@@ -5,18 +5,18 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "run": "tsc && node ./build/index.js",
+    "run": "tsc && node ./out/index.js",
     "dev": "nodemon ./src/index.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/blessed": "^0.1.19",
     "@types/boxen": "^3.0.1",
     "@types/chalk": "^2.2.0",
     "as-table": "^1.0.55",
     "axios": "^0.21.4",
-    "boxen": "^6.0.0",
-    "boxt": "^1.0.0",
+    "blessed": "^0.1.81",
     "commander": "^8.2.0",
     "is-valid-path": "^0.1.1",
     "prompts": "^2.4.1"

@@ -1,5 +1,5 @@
 import asTable from "as-table";
-import boxt from 'boxt';
+import blessed from "blessed";
 import { bgGreen, bgYellow, bgRed } from 'chalk';
 
 import { Proxy } from "./Interfaces/Proxy";
@@ -14,7 +14,7 @@ export class HGWindow {
 
   constructor(config: Config, type?: number) {
     this.config = config;
-    this.type = type ? type : this.type;
+    this.type = type || this.type;
   }
 
   /**
@@ -22,7 +22,7 @@ export class HGWindow {
    *
    * @param proxies The list of proxies. Must be of type {@link Proxy Proxy[]}
    */
-  render(proxies: Proxy[]): string {
+  render(proxies: Proxy[]) {
     let list: string[];
 
     switch (this.type) {
@@ -48,12 +48,26 @@ export class HGWindow {
       }
     }
 
+    // proxy list to string
     const table: string = asTable([list]);
-    return boxt(table, {
-      title: 'Hell\'s Gate',
-      align: 'left',
-      color: 'red',
-      theme: 'round*'
-    })
+    // new screen object
+    const screen: blessed.Widgets.Screen = blessed.screen();
+    screen.title = "Hell's Gate v2";
+
+    const box: blessed.Widgets.BoxElement = blessed.box({
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      content: table,
+      border: {
+        type: "line"
+      }
+    });
+
+    // show result
+    screen.append(box);
+    box.focus();
+    screen.render();
   }
 }

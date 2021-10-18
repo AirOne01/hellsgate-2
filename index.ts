@@ -51,44 +51,53 @@ if (opts['config']) {
   loader = new ConfigLoader(parsePath(program.args[0]));
 } else {
   loader = new ConfigLoader(parsePath());
+  loader.cancelCheck();
 }
 
 (async () => {
   if (!loader.check()) {
+    console.log(1);
+
     // if the file doesn't exists create one
     console.log(
       "⚠️ Config file doesn't exist or is invalid. Writing new file."
     );
 
-    const usePublicProxiesLists: any = opts['nopublic'] || await prompts({
+    const usePublicProxiesLists: boolean = opts['nopublic'] || await prompts({
       type: 'confirm',
       name: 'value',
       message: 'Use public proxy scrape sites?',
       initial: true
     })
 
-    const proxyAPI: any = opts['api'] || await prompts({
+    const proxyAPI: boolean = opts['api'] || await prompts({
       type: 'confirm',
       name: 'value',
       message: 'Start the proxy API with the app?',
       initial: false
     })
 
+    console.log(2);
+
     // pass the arguments inside the function
     config = new Config(usePublicProxiesLists, proxyAPI);
+    
+    console.log(3);
 
     writeFileSync(loader.getPath(), JSON.stringify(config, null, 2));
     console.log("✔️ Wrote config");
 
-    let proxies: Proxy[];
+    console.log(4);
+
+    // debug thing
+    let proxies: Proxy[] = [];
     for (let i = 0; i<50; i++) proxies.push({host: '127.0.0.1'});
     config.proxies = proxies;
     
+    console.log(5);
+
+    // renders the window
     const window = new HGWindow(config)
-    console.log(window.render(proxies));
+    window.render(proxies);
   } else config = loader.load(); // if the file exists load the config
 })();
-
-while(true) {
-
-}
