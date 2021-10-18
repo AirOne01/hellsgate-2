@@ -1,4 +1,3 @@
-import axios from "axios";
 import blessed from "blessed";
 import chalk from "chalk";
 import isValid from "is-valid-path";
@@ -60,18 +59,9 @@ if (loader.check()) {
   const screen: blessed.Widgets.Screen = blessed.screen();
   screen.title = "Hell's Gate v2";
 
-  let infoBox: blessed.Widgets.BoxElement = blessed.box({
-    parent: screen,
-    bottom: 0,
-    left: 0,
-    width: "100%",
-    height: 5,
-    border: "line",
-    fg: "red",
-    value: ""
-  })
-  screen.append(infoBox);
-
+  // box containing the proxy list
+  // TODO: make this responsive
+  // https://stackoverflow.com/questions/63249530
   let proxyBox: blessed.Widgets.BoxElement = blessed.box({
     parent: screen,
     top: 0,
@@ -83,6 +73,19 @@ if (loader.check()) {
     value: ""
   })
   screen.append(proxyBox);
+
+  // infobox at the bottom
+  let infoBox: blessed.Widgets.BoxElement = blessed.box({
+    parent: screen,
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    height: 5,
+    border: "line",
+    fg: "red",
+    value: ""
+  })
+  screen.append(infoBox);
 
   let usePublicProxiesLists: boolean;
   let undefinedUsePublicProxiesLists: boolean = false;
@@ -110,6 +113,7 @@ if (loader.check()) {
       top: "center",
       border: "line"
     })
+    screen.append(prompt);
 
     if (undefinedProxyAPI && undefinedUsePublicProxiesLists) {
       prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Use the proxy API ? (true/False): ", "false", (err, value) => {
@@ -150,21 +154,19 @@ if (loader.check()) {
       screen.render();
     });
 
+    // nothing for now
     screen.key(["enter"], function () {
     });
 
-    screen.key(["escape", "C-c"], function () {
+    // quit
+    screen.key(["q", "C-c"], function () {
       process.exit(0);
     });
-
-    screen.append(prompt);
-    screen.render();
   }
 
-  // show result
   screen.render();
 
-  // pass the arguments inside the function
+  // pass config
   config = new Config(usePublicProxiesLists, proxyAPI);
 
   writeFileSync(loader.getPath(), JSON.stringify(config, null, 2));
