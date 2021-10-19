@@ -5,10 +5,10 @@ import { join, isAbsolute } from "path";
 import { program } from "commander";
 import { writeFileSync } from "fs";
 
-import { ConfigLoader } from "./src/Config/ConfigLoader";
 import { Config } from "./src/Config/Config";
+import { ConfigLoader } from "./src/Config/ConfigLoader";
 import { Proxy } from "./src/Interfaces/Proxy";
-import { HGWindow } from "./src/HGWindow";
+import { HGWindow, Screen } from "./src/HGWindow";
 
 program
   .version("2.0.0")
@@ -55,38 +55,6 @@ if (loader.check()) {
   // if the file doesn't exists create one
   console.log("⚠️ Config file doesn't exist or is invalid. Writing new file.");
 
-  // new screen object
-  const screen: blessed.Widgets.Screen = blessed.screen();
-  screen.title = "Hell's Gate v2";
-
-  // box containing the proxy list
-  // TODO: make this responsive
-  // https://stackoverflow.com/questions/63249530
-  let proxyBox: blessed.Widgets.BoxElement = blessed.box({
-    parent: screen,
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: (screen.height as number) - 5,
-    border: "line",
-    fg: "red",
-    value: ""
-  })
-  screen.append(proxyBox);
-
-  // infobox at the bottom
-  let infoBox: blessed.Widgets.BoxElement = blessed.box({
-    parent: screen,
-    bottom: 0,
-    left: 0,
-    width: "100%",
-    height: 5,
-    border: "line",
-    fg: "red",
-    value: ""
-  })
-  screen.append(infoBox);
-
   let usePublicProxiesLists: boolean;
   let undefinedUsePublicProxiesLists: boolean = false;
   let proxyAPI: boolean;
@@ -105,66 +73,19 @@ if (loader.check()) {
     undefinedUsePublicProxiesLists = true;
   }
 
-  // this whole part is for replacing prompts.js with native prompts
-  if (undefinedUsePublicProxiesLists || undefinedProxyAPI) {
-    const prompt: blessed.Widgets.PromptElement = blessed.prompt({
-      parent: screen,
-      left: "center",
-      top: "center",
-      border: "line"
-    })
-    screen.append(prompt);
+  const screen: Screen = new Screen();
 
+  if (undefinedUsePublicProxiesLists || undefinedProxyAPI) {
     if (undefinedProxyAPI && undefinedUsePublicProxiesLists) {
-      prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Use the proxy API ? (true/False): ", "false", (err, value) => {
-        if (err) {
-          infoBox.content = err;
-        } else if (value) {
-          proxyAPI = (value === "true");
-          infoBox.content = chalk.greenBright("✔️ Edited 'proxyAPI' ") + chalk.magenta(proxyAPI);
-        }
-        screen.render();
-        prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Fetch public proxies list ? (True/false): ", "true", (err, value) => {
-          if (err) {
-            infoBox.content = err;
-          } else if (value) {
-            usePublicProxiesLists = (value === "true");
-            infoBox.content = chalk.greenBright("✔️ Edited 'usePublicProxiesLists' ") + chalk.magenta(usePublicProxiesLists);
-          }
-          screen.render();
-        });
+      screen.callPrompt(config, "proxyAPI", "Note: any value aside from \"true\" will be inteprated as \"false\".\n Use the proxy API ? (true/False): ", () => {
+        screen.callPrompt(config, "proxyAPI", "Note: any value aside from \"true\" will be inteprated as \"false\".\n Fetch public proxies list ? (True/false): ");
       })
     } else if (undefinedProxyAPI) {
-      prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Use the proxy API ? (true/False): ", "false", (err, value) => {
-        if (err) {
-          infoBox.content = err;
-        } else if (value) {
-          proxyAPI = (value === "true");
-          infoBox.content = chalk.greenBright("✔️ Edited 'proxyAPI' ") + chalk.magenta(proxyAPI);
-        }
-        screen.render();
-      })
-    } else if (undefinedUsePublicProxiesLists) prompt.input("Note: any value aside from \"true\" will be inteprated as \"false\".\n Fetch public proxies list ? (True/false): ", "true", (err, value) => {
-      if (err) {
-        infoBox.content = err;
-      } else if (value) {
-        usePublicProxiesLists = (value === "true");
-        infoBox.content = chalk.greenBright("✔️ Edited 'usePublicProxiesLists' ") + chalk.magenta(usePublicProxiesLists);
-      }
-      screen.render();
-    });
-
-    // nothing for now
-    screen.key(["enter"], function () {
-    });
-
-    // quit
-    screen.key(["q", "C-c"], function () {
-      process.exit(0);
-    });
+      screen.callPrompt(config, "proxyAPI", "Note: any value aside from \"true\" will be inteprated as \"false\".\n Use the proxy API ? (true/False): ");
+    } else if (undefinedUsePublicProxiesLists) {
+      screen.callPrompt(config, "proxyAPI", "Note: any value aside from \"true\" will be inteprated as \"false\".\n Fetch public proxies list ? (True/false): ");
+    }
   }
-
-  screen.render();
 
   // pass config
   config = new Config(usePublicProxiesLists, proxyAPI);

@@ -16,6 +16,17 @@ class Config {
     this.usePublicProxiesLists = usePublicProxiesLists;
     this.proxyAPI = proxyAPI;
   }
+
+  setValue(param: string, value: boolean) {
+    switch (param) {
+      case "usePublicProxiesLists":
+        this.usePublicProxiesLists = value;
+        break;
+      case "proxyAPI":
+        this.proxyAPI = value;
+        break;
+    }
+  }
 }
 
 export { Config };
