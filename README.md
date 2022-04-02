@@ -1,3 +1,8 @@
+# This project was abandonned
+
+For future references, this was a personnal project for interracting with the proxychains app with a nice GUI, after I discovered C's Curses library.
+I'll pick it up if I have time. Not my priority.
+
 # hellsgate-2
 
 Proof-of-concept clone of [proxychains](https://github.com/haad/proxychains) in TypeScript.
